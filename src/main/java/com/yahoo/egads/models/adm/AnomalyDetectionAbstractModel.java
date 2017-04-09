@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.HashMap;
 
 import com.yahoo.egads.data.JsonEncoder;
+import com.yahoo.egads.data.Model;
+import com.yahoo.egads.data.Model.ModelType;
+import com.yahoo.egads.models.tsmm.TimeSeriesModel;
 
 public abstract class AnomalyDetectionAbstractModel implements AnomalyDetectionModel {
 
@@ -22,13 +25,14 @@ public abstract class AnomalyDetectionAbstractModel implements AnomalyDetectionM
     protected float amntAutoSensitivity = (float) 0.05;
     protected String outputDest = "";
 	protected String modelName;
+	protected boolean modified;
 
     public String getModelName() {
 		return modelName;
 	}
 
-	public String getModelType() {
-    	return "Anomaly";
+    public ModelType getModelType() {
+      return Model.ModelType.ANOMALY;
     }
     
     @Override
@@ -89,5 +93,19 @@ public abstract class AnomalyDetectionAbstractModel implements AnomalyDetectionM
             this.sDAutoSensitivity = new Float(config.getProperty("AUTO_SENSITIVITY_SD"));
         }
       	this.outputDest = config.getProperty("OUTPUT");
+    }
+
+    public boolean isModified () {
+      return modified;
+    }
+    public void clearModified() {
+      modified = false;
+    }
+
+    public String errorSummaryString() {
+      return "";
+    }
+    
+    public void clearErrorStats() {
     }
 }

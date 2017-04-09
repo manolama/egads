@@ -6,6 +6,8 @@
 
 package com.yahoo.egads.models.tsmm;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Properties;
 
 import org.json.JSONObject;
@@ -30,18 +32,40 @@ public abstract class TimeSeriesAbstractModel implements TimeSeriesModel {
     protected double mse;
     protected double sae;
     protected String modelName;
+    protected Properties config;
+    protected boolean modified;
 
     static org.apache.logging.log4j.Logger logger = org.apache.logging.log4j.LogManager.getLogger(TimeSeriesModel.class.getName());
 
     protected boolean errorsInit = false;
     protected int dynamicParameters = 0;
 
+    public TimeSeriesAbstractModel(Properties config) {
+      this.config = config;
+      modified = false;
+        if (config.getProperty("DYNAMIC_PARAMETERS") != null) {
+            this.dynamicParameters = new Integer(config.getProperty("DYNAMIC_PARAMETERS"));
+        }        
+    }
+
+    protected long weeklyOffset (long time) {
+      Date d = new Date(time * 1000);
+      long ret = d.getDay() * 86400 + d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
+      return ret;
+    }
+
+    protected long dailyOffset (long time) {
+      Date d = new Date(time * 1000);
+      long ret = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
+      return ret;
+    }
+    
     public String getModelName() {
 		return modelName;
 	}
 
-    public String getModelType() {
-    	return "Forecast";
+    public ModelType getModelType() {
+      return Model.ModelType.FORECAST;
     }
     
     @Override
@@ -54,14 +78,15 @@ public abstract class TimeSeriesAbstractModel implements TimeSeriesModel {
         JsonEncoder.fromJson(this, json_obj);
     }
 
-    // Acts as a factory method.
-    public TimeSeriesAbstractModel(Properties config) {
-        if (config.getProperty("DYNAMIC_PARAMETERS") != null) {
-            this.dynamicParameters = new Integer(config.getProperty("DYNAMIC_PARAMETERS"));
-        }
-
+    public void clearErrorStats() {
+      bias = 0.0;
+      mad = 0.0;
+      mape = 0.0;
+      mse = 0.0;
+      sae = 0.0;
+      errorsInit = false;
     }
-
+    
     // 1 when absolute value of error1 is smaller than the absolute value of error2
     // 0 when absolute value of error1 is equal(upto tolerance) to the absolute value of error2
     // -1 when absolute value of error1 is greater than the absolute value of error2
@@ -91,7 +116,7 @@ public abstract class TimeSeriesAbstractModel implements TimeSeriesModel {
         score += compareError(model1.getMAPE(), model2.getMAPE());
         score += compareError(model1.getMSE(), model2.getMSE());
         score += compareError(model1.getSAE(), model2.getSAE());
-
+        logger.debug ("Comparison score: " + score);
         if (score == 0) {
             // At this point, we're still unsure which one is best
             // so we'll take another approach
@@ -100,16 +125,26 @@ public abstract class TimeSeriesAbstractModel implements TimeSeriesModel {
                             model1.getBias() - model2.getBias() + model1.getMAD() - model2.getMAD() +
                             (Double.isNaN(mapeDiff) ? 0 : mapeDiff) +
                             model1.getMSE() - model2.getMSE() + model1.getSAE() - model2.getSAE();
+            logger.debug ("Diff: " + diff);
             return (diff < 0);
         }
-
+        
         return (score > 0);
     }
-
+    
+    public String errorSummaryString () {
+      return ("B:" + String.format("%.2f", getBias()) + 
+       "\tMAD:" + String.format("%.2f", getMAD()) + 
+       "\tMAPE:" + String.format("%.2f", getMAPE()) +
+       "\tMSE:" + String.format("%.2f", getMSE()) +
+       "\tSAE:" + String.format("%.2f", getSAE()));
+    }
+    
     /*
      * Forecasting model already has the errors defined.
      */
     protected void initForecastErrors(TimeSeriesAbstractModel forecaster, TimeSeries.DataSequence data) {
+        clearErrorStats();
         this.bias = forecaster.getBias();
         this.mad = forecaster.getMAD();
         this.mape = forecaster.getMAPE();
@@ -122,6 +157,7 @@ public abstract class TimeSeriesAbstractModel implements TimeSeriesModel {
      * Forecasting model already has the errors defined.
      */
     protected void initForecastErrors(ForecastingModel forecaster, TimeSeries.DataSequence data) {
+        clearErrorStats();
         this.bias = forecaster.getBias();
         this.mad = forecaster.getMAD();
         this.mape = forecaster.getMAPE();
@@ -135,6 +171,7 @@ public abstract class TimeSeriesAbstractModel implements TimeSeriesModel {
      */
     protected void initForecastErrors(ArrayList<Float> model, TimeSeries.DataSequence data) {
         // Reset various helper summations
+        clearErrorStats();
         double sumErr = 0.0;
         double sumAbsErr = 0.0;
         double sumAbsPercentErr = 0.0;
@@ -228,5 +265,13 @@ public abstract class TimeSeriesAbstractModel implements TimeSeriesModel {
             return -1;
         }
         return sae;
+    }
+
+    public boolean isModified () {
+      return modified;
+    }
+  
+    public void clearModified() {
+      modified = false;
     }
 }

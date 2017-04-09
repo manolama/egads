@@ -1,3 +1,8 @@
+/*
+ * Copyright 2015, Yahoo Inc.
+ * Copyrights licensed under the GPL License.
+ * See the accompanying LICENSE file for terms.
+ */
 // main entry point for egads processing node
 
 package com.yahoo.egads;
