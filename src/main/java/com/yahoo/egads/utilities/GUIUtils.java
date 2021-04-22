@@ -119,6 +119,9 @@ public class GUIUtils extends ApplicationFrame {
     
     /**
      * Compute the time-series of anomalies.
+     * @param plot The non-null plot to add to.
+     * @param observedSeries The non-null observed data.
+     * @param expectedSeries The non-null expected data.
      */
     public void addAnomalyTS(CombinedDomainXYPlot plot, DataSequence observedSeries, DataSequence expectedSeries) {
         // Compute the time-series of errors.
@@ -153,6 +156,8 @@ public class GUIUtils extends ApplicationFrame {
     
     /**
      * Add anomalies to the plot.
+     * @param plot The non-null plot to add to.
+     * @param anomalyList The non-null anomalies.
      */
     public void addAnomalies(XYPlot plot, ArrayList<Anomaly> anomalyList) {
         for (Anomaly a : anomalyList) {
@@ -167,6 +172,9 @@ public class GUIUtils extends ApplicationFrame {
     
     /**
      * Creates a float[] time-series
+     * @param ds The non-null array of data to plot.
+     * @param label A label for the series.
+     * @return A plotable dataset.
      */
     public XYDataset createDataset(Float[] ds, String label) {
          XYSeries observations = new XYSeries(label);
@@ -181,7 +189,9 @@ public class GUIUtils extends ApplicationFrame {
     
     /**
      * Creates a dataset.
-     * @return the dataset.
+     * @param ds The non-null array of data to plot.
+     * @param label A label for the series.
+     * @return A plotable dataset.
      */
     public XYDataset createDataset(DataSequence ds, String label) {
         XYSeries observations = new XYSeries(label);
@@ -196,7 +206,10 @@ public class GUIUtils extends ApplicationFrame {
     
     /**
      * Starting point for the forecasting charting demo application.
-     * @param args ignored.
+     * @param orig The non-null original data to plot.
+     * @param predicted The non-null predicted data to plot.
+     * @param anomalyList The non-null anomaly list. May be empty.
+     * @param config Non-null configuration. May be empty.
      */
     public static void plotResults(DataSequence orig, DataSequence predicted, ArrayList<Anomaly> anomalyList, Properties config) {
         GUIUtils gui = new GUIUtils("EGADS GUI", orig, predicted, anomalyList, config);

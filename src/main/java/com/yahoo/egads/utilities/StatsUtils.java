@@ -61,6 +61,8 @@ public class StatsUtils {
     }
     
     /**
+     *
+     * @param l A non-null list of doubles to work on.
      * @return the number, average, variance, min, median and max of a
      * list of Integers
      */
@@ -144,6 +146,9 @@ public class StatsUtils {
      * <p>
      *  The return value is a long of the double value multiplied by Integer.MAX_VALUE
      *  so that as much precision is possible while transferring over network.
+     *
+     * @param quartile The quartile to compute.
+     * @param l The non-null list of values to work over.
      */
     private static double getQuartile(Quartile quartile, List<Double> l) {
         double q1 = (l.size() + 1) * (quartile.getType() / 4.0);
@@ -188,6 +193,9 @@ public class StatsUtils {
     
     /**
      * Same as <code>getHistogram</code> but operates on <code>BigIntegers</code>.
+     * @param data The non-null data to process.
+     * @param breaks number of breaks in the histogram
+     * @return List of integer values size of the breaks.
      */
     public static List<Integer> getHistogramBigInt(List<BigInteger> data, int breaks) {
         if (data.isEmpty()) {
@@ -216,23 +224,23 @@ public class StatsUtils {
     
     /**
      * An abstract class that holds the minimum, maximum, median
-     * average, quartiles one and three, and second, third and fourth <a href=
-     * "http://en.wikipedia.org/wiki/Central_moment">central moments</a>.
-     * <p>
-     * 
-     * <table cellpadding="5">
+     * average, quartiles one and three, and second, third and fourth
+     * <a href="http://en.wikipedia.org/wiki/Central_moment">central moments</a>.
+     *
+     * <table cellpadding="5" summary="">
      * <tr>
      * <td><b>Central Moment</b></td>
      * <td><b>Use</b></td>
      * </tr>
+     * <tr>
      * <td>second</td>
      * <td>variance</td>
      * </tr>
-     * </tr>
+     * <tr>
      * <td>third</td>
      * <td>to define skewness</td>
      * </tr>
-     * </tr>
+     * <tr>
      * <td>fourth</td>
      * <td>to define kurtosis</td>
      * </tr>
@@ -406,6 +414,7 @@ public class StatsUtils {
 
 
     /**
+     * @param data The incoming data to rank.
      * @return list of sample ranks
      */
     public static List<Double> rank(List<Double> data) {
@@ -442,6 +451,7 @@ public class StatsUtils {
     /**
      * Runs the <a href="http://en.wikipedia.org/wiki/Shapiro-Wilk_test">Shapiro-Wilk test</a>
      * on a list of double values.
+     * @param d The data to work on.
      * @return an array of size two if everything goes well, or null
      * if there's an error.
      */
@@ -511,10 +521,10 @@ public class StatsUtils {
 
         /**
          * ALGORITHM AS R94 APPL. STATIST. (1995) VOL.44, NO.4
-         * <p>
+         * </p>
          * Calculates Shapiro-Wilk normality test and P-value for sample sizes 3 <= n <= 5000 . Handles censored or
          * uncensored data. Corrects AS 181, which was found to be inaccurate for n > 50.
-         * <p>
+         * </p>
          * NOTE: Semi-strange porting kludge alert. FORTRAN allows subroutine arguments to be modified by the called routine
          * (passed by reference, not value), and the original code for this routine makes use of that feature to return
          * multiple results. To avoid changing the code any more than necessary, I've used Java arrays to simulate this
@@ -525,7 +535,7 @@ public class StatsUtils {
          * initialization has been performed, to speed up subsequent calls on the same data set. Note that although the
          * contents of a[] will be computed by the routine on the first call, the caller must still allocate the array space
          * and pass the unfilled array in to the subroutine. The routine will set the contents but not allocate the space.
-         * <p>
+         * </p>
          * As described above with the constants, the data arrays x[] and a[] are referenced with a base element of 1 (like
          * FORTRAN) instead of 0 (like Java) to avoid screwing up the algorithm. To pass in 100 data points, declare x[101]
          * and fill elements x[1] through x[100] with data. x[0] will be ignored.

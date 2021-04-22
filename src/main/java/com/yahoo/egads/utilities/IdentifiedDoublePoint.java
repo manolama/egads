@@ -35,6 +35,7 @@ public class IdentifiedDoublePoint extends DoublePoint {
      * The wrapped array is referenced, it is <em>not</em> copied.
      *
      * @param point the n-dimensional point in double space
+     * @param id A unique ID.
      */
     public IdentifiedDoublePoint(final double[] point, int id) {
         super(point);
@@ -47,6 +48,7 @@ public class IdentifiedDoublePoint extends DoublePoint {
      * The wrapped array is copied to an internal double array.
      *
      * @param point the n-dimensional point in integer space
+     * @param id A unique ID.
      */
     public IdentifiedDoublePoint(final int[] point, int id) {
         super(point);

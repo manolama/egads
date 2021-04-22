@@ -134,6 +134,8 @@ public abstract class TimeSeriesAbstractModel implements TimeSeriesModel {
 
     /**
      * Initializes all errors given the model.
+     * @param model The non-null data model that matches the size of the data sequence.
+     * @param data The non-null data sequence.
      */
     protected void initForecastErrors(ArrayList<Float> model, TimeSeries.DataSequence data) {
         // Reset various helper summations
